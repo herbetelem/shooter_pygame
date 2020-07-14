@@ -1,4 +1,6 @@
 import pygame
+import math
+
 from game import Game
 pygame.init()
 
@@ -11,6 +13,24 @@ screen = pygame.display.set_mode((1080, 720))
 # importer et charger le background*
 background = pygame.image.load('assets/bg.jpg')
 
+# importer la bannier
+banner = pygame.image.load('assets/banner.png')
+banner = pygame.transform.scale(banner, (500, 500))
+banner_rect = banner.get_rect()
+banner_rect.x = math.ceil(screen.get_width() / 4)
+
+# import charger notre bouton pour lancer la partie
+play_button = pygame.image.load('assets/button.png')
+play_button = pygame.transform.scale(play_button, (400, 150))
+play_button_rect = play_button.get_rect()
+play_button_rect.x = math.ceil(screen.get_width() / 3.33)
+play_button_rect.y = math.ceil(screen.get_height() / 2)
+
+# import du son
+sound_tir = pygame.mixer.Sound('assets/sounds/tir.ogg')
+sound_game_over = pygame.mixer.Sound('assets/sounds/game_over.ogg')
+sound_click = pygame.mixer.Sound('assets/sounds/click.ogg')
+
 game = Game()
 
 running = True
@@ -21,21 +41,16 @@ while running:
     # appliquer le background
     screen.blit(background, (0, -200))
 
-    # afficher le joueur
-    screen.blit(game.player.image, game.player.rect)
+    # verifier si le jeu a commencou ou pas
+    if game.is_playing:
+        # declencher les instructiond de la partie
+        game.update(screen)
+    # si le jeu n'est pas lancer
+    else:
+        # ajouter l'ecran de bienvenue
+        screen.blit(play_button, play_button_rect)
+        screen.blit(banner, banner_rect)
 
-    # recuperer les projectiles du joeur
-    for projectiles in game.player.all_projectiles:
-        projectiles.move()
-
-    # appliquer les projectiles
-    game.player.all_projectiles.draw(screen)
-
-    # check ver la ou le joueur veu aller
-    if game.pressed.get(pygame.K_RIGHT) and game.player.rect.x + game.player.rect.width < screen.get_width():
-        game.player.move_right()
-    elif game.pressed.get(pygame.K_LEFT) and game.player.rect.x > 0:
-        game.player.move_left()
 
     # update le screen
     pygame.display.flip()
@@ -55,6 +70,14 @@ while running:
             # detecter si la touche espace est used pour tirer
             if event.key == pygame.K_SPACE:
                 game.player.lauche_prejectile()
+                sound_tir.play()
 
         elif event.type == pygame.KEYUP:
             game.pressed[event.key] = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # verifier que la souris est appyer au bon endroit
+            if play_button_rect.collidepoint(event.pos):
+                # mettre le jeu en mode lander
+                sound_click.play()
+                game.start()
