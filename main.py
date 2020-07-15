@@ -26,10 +26,6 @@ play_button_rect = play_button.get_rect()
 play_button_rect.x = math.ceil(screen.get_width() / 3.33)
 play_button_rect.y = math.ceil(screen.get_height() / 2)
 
-# import du son
-sound_tir = pygame.mixer.Sound('assets/sounds/tir.ogg')
-sound_game_over = pygame.mixer.Sound('assets/sounds/game_over.ogg')
-sound_click = pygame.mixer.Sound('assets/sounds/click.ogg')
 
 game = Game()
 
@@ -70,7 +66,6 @@ while running:
             # detecter si la touche espace est used pour tirer
             if event.key == pygame.K_SPACE:
                 game.player.lauche_prejectile()
-                sound_tir.play()
 
         elif event.type == pygame.KEYUP:
             game.pressed[event.key] = False
@@ -78,6 +73,5 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # verifier que la souris est appyer au bon endroit
             if play_button_rect.collidepoint(event.pos):
-                # mettre le jeu en mode lander
-                sound_click.play()
+                # mettre le jeu en mode lancer
                 game.start()
